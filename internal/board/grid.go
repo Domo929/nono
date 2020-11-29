@@ -1,6 +1,10 @@
 package board
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+	"os"
+)
 
 // Square identifies what value a grid square holds
 type Square uint8
@@ -30,7 +34,12 @@ func New(x, y int) Grid {
 }
 
 // Print prints out a simple representation of the board to stdout
-func (g Grid) Print() {
+// the writer is used to redirect to a different writer than stdout. If w is nil,
+// stdout is used
+func (g Grid) Print(w io.Writer) {
+	if w == nil {
+		w = os.Stdout
+	}
 	gridStr := ""
 	for _, row := range g {
 		for _, sq := range row {
@@ -47,5 +56,5 @@ func (g Grid) Print() {
 		}
 		gridStr += "\n"
 	}
-	fmt.Print(gridStr)
+	fmt.Fprint(w, gridStr)
 }
