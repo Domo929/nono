@@ -45,3 +45,66 @@ func NewFromFile(path string) (*Board, error) {
 
 	return b, nil
 }
+
+func (b Board) Valid() bool {
+	for rowNdx, row := range b.Grid {
+		if !validLine(b.RowHints[rowNdx], row) {
+			return false
+		}
+	}
+	for i := 0; i < len(b.Grid[0]); i++ {
+		if !validLine(b.ColHints[i], getCol(b, i)) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func getCol(b Board, colNdx int) []Square {
+	col := make([]Square, 0)
+	for _, row := range b.Grid {
+		col = append(col, row[colNdx])
+	}
+	return col
+}
+
+func validLine(hint []int, line []Square) bool {
+	if len(hint) == 0 || len(line) == 0 {
+		return false
+	}
+	hintNdx := 0
+	curLength := 0
+	curHint := &hint[hintNdx]
+	afterYes := false
+	for _, sq := range line {
+		switch sq {
+		case Unknown:
+			return false
+		case Yes:
+			curLength++
+			afterYes = true
+			if curHint == nil {
+				return false
+			}
+			if curLength == *curHint {
+				curHint, hintNdx = nextHint(hint, hintNdx)
+			}
+		case No:
+			if curHint != nil && curLength != *curHint && afterYes {
+				return false
+			}
+			curLength = 0
+			afterYes = false
+		}
+	}
+	return true
+}
+
+func nextHint(hint []int, curNdx int) (*int, int) {
+	nextNdx := curNdx + 1
+	if nextNdx >= len(hint) {
+		return nil, curNdx
+	}
+	return &hint[nextNdx], nextNdx
+}
