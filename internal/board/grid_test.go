@@ -8,7 +8,7 @@ import (
 )
 
 func TestGrid_Print(t *testing.T) {
-	g := New(5, 5)
+	g := newGrid(5, 5)
 
 	g[0][1] = Yes
 

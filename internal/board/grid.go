@@ -24,8 +24,8 @@ const (
 // The axes are [y][x]Square
 type Grid [][]Square
 
-// New makes the internal slices for a Grid
-func New(x, y int) Grid {
+// newGrid makes the internal slices for a Grid
+func newGrid(x, y int) Grid {
 	g := make([][]Square, x)
 	for i := 0; i < x; i++ {
 		g[i] = make([]Square, y)
