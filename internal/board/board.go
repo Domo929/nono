@@ -7,16 +7,22 @@ import (
 )
 
 var (
+	// ErrRowMismatch is an error for when the number of rows and row hints are not the same
 	ErrRowMismatch = errors.New("mismatch between number of rows and row hints")
+
+	// ErrColMismatch is an error for when the number of cols and col hints are not the same
 	ErrColMismatch = errors.New("mismatch between number of cols and col hints")
 )
 
+// Board is a struct that contains the hints for each row and column, as well as the current state of the board
 type Board struct {
 	Grid     Grid    `json:"-"`
 	RowHints [][]int `json:"row_hints"`
 	ColHints [][]int `json:"col_hints"`
 }
 
+// New takes in the x and y size and the hints and returns a board
+// an error is returned if the length of the hints does not match the grid length
 func New(x, y int, rowHints, colHints [][]int) (*Board, error) {
 	if len(rowHints) != y {
 		return nil, ErrRowMismatch
@@ -31,6 +37,7 @@ func New(x, y int, rowHints, colHints [][]int) (*Board, error) {
 	}, nil
 }
 
+// NewFromFile opens a board game from a json file and returns it
 func NewFromFile(path string) (*Board, error) {
 	f, err := os.Open(path)
 	if err != nil {
@@ -46,7 +53,8 @@ func NewFromFile(path string) (*Board, error) {
 	return b, nil
 }
 
-func (b Board) Valid() bool {
+// Solved checks a board to see if it's solved
+func (b Board) Solved() bool {
 	for rowNdx, row := range b.Grid {
 		if !validLine(b.RowHints[rowNdx], row) {
 			return false
@@ -61,6 +69,7 @@ func (b Board) Valid() bool {
 	return true
 }
 
+// getCol extracts a column from the game board as a singular slice for validation
 func getCol(b Board, colNdx int) []Square {
 	col := make([]Square, 0)
 	for _, row := range b.Grid {
@@ -69,6 +78,7 @@ func getCol(b Board, colNdx int) []Square {
 	return col
 }
 
+// validLine checks a line to see if the layout matches the provided hints
 func validLine(hint []int, line []Square) bool {
 	if len(hint) == 0 || len(line) == 0 {
 		return false
@@ -101,6 +111,7 @@ func validLine(hint []int, line []Square) bool {
 	return true
 }
 
+// nextHint is a simple helper that checks whether there is a next hint
 func nextHint(hint []int, curNdx int) (*int, int) {
 	nextNdx := curNdx + 1
 	if nextNdx >= len(hint) {

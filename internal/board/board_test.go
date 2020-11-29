@@ -109,7 +109,7 @@ func TestBoard_Valid(t *testing.T) {
 			ColHints: colHints,
 		}
 
-		isValid := b.Valid()
+		isValid := b.Solved()
 		require.True(t, isValid)
 	})
 }
